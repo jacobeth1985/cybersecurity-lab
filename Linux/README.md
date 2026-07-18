@@ -1,7 +1,5 @@
 # Linux Lab
 
-# Linux Lab
-
 Welcome to my Linux Lab.
 
 This folder documents my hands-on Linux learning journey, including command-line practice, system administration, scripting, security, and troubleshooting exercises.
