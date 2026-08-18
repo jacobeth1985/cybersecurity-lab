@@ -1,13 +1,17 @@
- # Lab 06: DNS Investigation with nslookup
+# Lab 06: DNS and Windows Endpoint Investigation
 
 ## Objective
 
-Use `nslookup` to investigate how DNS translates domain names into IP addresses.
+Investigate how DNS translates names into IP addresses, then demonstrate how a SOC analyst can correlate a live Windows network connection to its owning process, service, executable path, and digital signature.
+
+> **Scope note:** The DNS exercises were completed in Ubuntu on WSL. The endpoint investigation was performed on a live Windows workstation. Simulated alert exercises are documented separately and are not evidence from the live endpoint.
 
 ## Tool Used
 
 - Ubuntu on WSL
 - `nslookup` from the `dnsutils` package
+- Windows PowerShell
+- Windows networking, process, service, and signature inspection cmdlets
 
 ## DNS Lookup: google.com
 
@@ -37,6 +41,8 @@ GitHub resolved to this IPv4 address:
 
 A single domain can resolve to one or more IP addresses. These addresses can change over time because large services use distributed infrastructure.
 
+DNS resolution alone does not prove that a workstation is communicating with an IP address. A current connection must be observed and then correlated to an owning process.
+
 ## MX Record Lookup: gmail.com
 
 Command used:
@@ -58,3 +64,50 @@ Gmail returned these mail exchangers:
 MX means **Mail Exchanger**. MX records tell other mail systems which servers should receive email for a domain.
 
 The priority number matters: lower numbers have higher priority. Gmail’s primary mail server has priority 5, while the `alt` servers provide backup options.
+
+---
+
+## Windows SOC Investigation Extension
+
+This extension uses the following evidence chain:
+
+```text
+DNS name
+  -> IP address
+  -> active network connection
+  -> OwningProcess / PID
+  -> process and parent process
+  -> Windows service
+  -> executable path
+  -> Authenticode digital signature
+  -> assessment
+```
+
+The key lesson is to corroborate evidence rather than trust a filename, a port, or a single tool result.
+
+### Live endpoint case: McAfee Framework Host
+
+An established HTTPS connection was correlated to `mc-fw-host.exe` (PID values are intentionally omitted from this portfolio write-up). Investigation established that the process:
+
+- Had `services.exe` as its parent, consistent with a service-hosted process.
+- Was registered as the running **McAfee Framework Host** Windows service.
+- Ran from an expected `C:\Program Files\McAfee\...` location rather than a user-writable temporary directory.
+- Had a **Valid** Authenticode signature.
+
+**Assessment: likely legitimate.** This is an evidence-based assessment, not a claim that any process is permanently safe. A full enterprise investigation would also consider host baselines, hashes, telemetry history, vendor reputation, and organizational policy.
+
+Read the full case study in [windows-process-investigation.md](windows-process-investigation.md). A reusable command reference is in [commands.md](commands.md), and simulated SOC process-correlation exercises are clearly separated in [simulated-soc-exercises.md](simulated-soc-exercises.md).
+
+## Skills Demonstrated
+
+- DNS and MX record lookup with `nslookup`
+- Difference between DNS resolution and observed network communication
+- Correlation of TCP connections to `OwningProcess` / PID
+- Process and parent-process investigation
+- Windows service ownership and executable-path review
+- Authenticode signature verification
+- Evidence-based SOC triage and documentation
+
+## Evidence and Privacy
+
+Live screenshots are not included because they may disclose usernames, hostnames, internal addresses, process IDs, or other endpoint details. See [screenshots/README.md](screenshots/README.md) for a safe approach to adding sanitized evidence later.
