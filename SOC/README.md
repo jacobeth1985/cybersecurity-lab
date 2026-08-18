@@ -82,6 +82,8 @@ The purpose of this lab is to simulate the daily responsibilities of a Security 
 
 This folder will include practical SOC projects such as:
 
+- [Lab 01: Windows Event Log Investigation](Lab-01-Windows-Event-Log-Investigation/README.md)
+
 - SIEM Investigations
 - Microsoft Sentinel Labs
 - Splunk Detection Labs
@@ -111,7 +113,7 @@ This folder will include practical SOC projects such as:
 # Progress Tracker
 
 - [ ] SOC Fundamentals
-- [ ] Log Analysis
+- [x] Log Analysis — Windows Security and System event investigation
 - [ ] SIEM Fundamentals
 - [ ] Microsoft Sentinel
 - [ ] Splunk
